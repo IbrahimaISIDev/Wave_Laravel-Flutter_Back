@@ -15,6 +15,7 @@ class WelcomeUser extends Mailable
     public $qrUrl;
     protected $cardPdfPath;
     public $code;
+
     public function __construct($user, $qrUrl, $cardPdfPath = null, $code = null)
     {
         $this->user = $user;
@@ -22,14 +23,21 @@ class WelcomeUser extends Mailable
         $this->cardPdfPath = $cardPdfPath;
         $this->code = $code;
     }
+
     public function build()
     {
         $mail = $this->view('emails.welcome')
-                     ->subject('Bienvenue sur Wave');
+                     ->subject('Bienvenue sur SamaXaalis - Votre nouvelle expérience de transfert d\'argent')
+                     ->with([
+                         'userName' => $this->user->name, // Ajouter le prénom ou nom de l'utilisateur
+                         'qrUrl' => $this->qrUrl,
+                         'code' => $this->code,
+                     ]);
 
+        // Si une carte PDF est fournie, l'attacher
         if ($this->cardPdfPath && file_exists($this->cardPdfPath)) {
             $mail->attach($this->cardPdfPath, [
-                'as' => 'votre_carte_wave.pdf',
+                'as' => 'votre_carte_samaxaalis.pdf',
                 'mime' => 'application/pdf'
             ]);
         }

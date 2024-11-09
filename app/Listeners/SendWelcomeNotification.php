@@ -12,6 +12,7 @@ class SendWelcomeNotification
     public function handle(UserRegistered $event)
     {
         try {
+            // Envoi du mail de bienvenue
             Mail::to($event->mailData['user']->email)
                 ->send(new WelcomeUser(
                     $event->mailData['user'],
@@ -20,9 +21,12 @@ class SendWelcomeNotification
                     $event->mailData['code']
                 ));
 
-            Log::info('Email de bienvenue envoyé avec succès à : ' . $event->mailData['user']->email);
+            // Log pour l'envoi du mail
+            Log::info('Un e-mail de bienvenue a été envoyé avec succès à : ' . $event->mailData['user']->email 
+                      . ' pour l\'application SamaXaalis.');
         } catch (\Exception $e) {
-            Log::error('Erreur lors de l\'envoi de l\'email de bienvenue : ' . $e->getMessage());
+            // Log en cas d'erreur
+            Log::error('Erreur lors de l\'envoi de l\'email de bienvenue pour SamaXaalis : ' . $e->getMessage());
         }
     }
 }

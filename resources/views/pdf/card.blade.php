@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Carte Wave</title>
+    <title>Carte SamaXaalis</title>
     <style>
         @page {
             margin: 0;
@@ -26,11 +26,9 @@
             border-radius: 16px;
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            /* on doit aussi centrer la carte au millieu de la page */
             display: flex;
             justify-content: center;
             align-items: center;
-
         }
         .pattern-bg {
             position: absolute;
@@ -51,22 +49,10 @@
             background: rgba(255, 255, 255, 0.2);
             transform: rotate(45deg);
         }
-        .diamond-1 {
-            top: 20px;
-            left: 20px;
-        }
-        .diamond-2 {
-            top: 20px;
-            right: 20px;
-        }
-        .diamond-3 {
-            bottom: 20px;
-            left: 20px;
-        }
-        .diamond-4 {
-            bottom: 20px;
-            right: 20px;
-        }
+        .diamond-1 { top: 20px; left: 20px; }
+        .diamond-2 { top: 20px; right: 20px; }
+        .diamond-3 { bottom: 20px; left: 20px; }
+        .diamond-4 { bottom: 20px; right: 20px; }
         .qr-container {
             position: absolute;
             top: 50%;
@@ -124,7 +110,7 @@
             </div>
             
             <!-- Texte Scanner -->
-            <div class="scanner-text">Scanner</div>
+            <div class="scanner-text">Scanner le code QR</div>
             
             <!-- Icône Pingouin -->
             <div class="penguin-icon">

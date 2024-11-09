@@ -6,24 +6,35 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class AddFavoriRequest extends FormRequest
 {
-    public function authorize()
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
     {
-        return true;
+        return true; // L'authentification est gérée par le middleware
     }
 
-    public function rules()
+    /**
+     * Get the validation rules that apply to the request.
+     */
+    public function rules(): array
     {
         return [
-            'telephone' => 'required|string|exists:users,telephone',
-            'alias' => 'nullable|string|max:50'
+            'telephone' => 'required|string|max:20',
+            'nom_complet' => 'required|string|max:255'
         ];
     }
 
-    public function messages()
+    /**
+     * Get custom messages for validator errors.
+     */
+    public function messages(): array
     {
         return [
-            'telephone.exists' => 'Ce numéro n\'est pas inscrit sur Wave',
-            'alias.max' => 'L\'alias ne doit pas dépasser 50 caractères'
+            'telephone.required' => 'Le numéro de téléphone est obligatoire',
+            'telephone.max' => 'Le numéro de téléphone ne doit pas dépasser 20 caractères',
+            'nom_complet.required' => 'Le nom complet est obligatoire',
+            'nom_complet.max' => 'Le nom complet ne doit pas dépasser 255 caractères'
         ];
     }
 }

@@ -4,17 +4,33 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\MerchantPaymentRequest;
 use App\Services\MerchantService;
+use App\Services\QRPaymentService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
 class MerchantController extends Controller
 {
     protected $merchantService;
+    protected $qrPaymentService;
 
-    public function __construct(MerchantService $merchantService)
+    public function __construct(MerchantService $merchantService, QRPaymentService $qrPaymentService)
     {
         $this->merchantService = $merchantService;
+        $this->qrPaymentService = $qrPaymentService;
+
     }
+
+     /**
+     * Générer un QR code pour le marchand
+     */
+    public function generateQR()
+    {
+        $merchant = auth()->user();
+        $qrCode = $this->qrPaymentService->generateMerchantQR($merchant);
+        
+        return response($qrCode, 200)->header('Content-Type', 'image/svg+xml');
+    }
+
 
     public function processPayment(MerchantPaymentRequest $request)
     {
@@ -67,5 +83,28 @@ class MerchantController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+     /**
+     * Traiter un paiement via QR code
+     */
+    public function processQRPayment(Request $request)
+    {
+        $validated = $request->validate([
+            'qr_data' => 'required|string',
+            'montant' => 'required|numeric|min:0',
+            'description' => 'nullable|string'
+        ]);
+
+        $client = auth()->user();
+        
+        $result = $this->qrPaymentService->processQRPayment(
+            $validated['qr_data'],
+            $client,
+            $validated['montant'],
+            $validated['description'] ?? null
+        );
+
+        return response()->json($result);
     }
 }

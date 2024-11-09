@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\UpdateSecretCodeRequest;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -21,7 +22,7 @@ class AuthController extends Controller
         try {
             $result = $this->authService->login(
                 $request->telephone,
-                $request->code
+                $request->secret_code
             );
 
             return response()->json([
@@ -67,6 +68,24 @@ class AuthController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Erreur lors de la récupération du profil',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function updateSecretCode(UpdateSecretCodeRequest $request)
+    {
+        try {
+            $result = $this->authService->updateSecretCode(
+                $request->user(),
+                $request->new_secret_code
+            );
+            return response()->json($result);
+        } catch (\Exception $e) {
+            Log::error('Erreur mise à jour code secret: ' . $e->getMessage());
+            return response()->json([
+                'status' => false,
+                'message' => 'Erreur lors de la mise à jour du code secret',
                 'error' => $e->getMessage()
             ], 500);
         }

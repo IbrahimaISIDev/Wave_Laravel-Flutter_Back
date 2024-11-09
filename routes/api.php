@@ -30,6 +30,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
     Route::put('/users/update-profile', [UserController::class, 'updateProfile']);
+    Route::post('update-secret-code', [AuthController::class, 'updateSecretCode']);
     
     // Transferts
     Route::post('/transfer', [TransactionController::class, 'transfer']);
@@ -45,12 +46,18 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Favoris
-    Route::post('/favoris', [FavoriController::class, 'add']);
-    Route::get('/favoris', [FavoriController::class, 'list']);
+    Route::prefix('favoris')->group(function () {
+        Route::post('/add', [FavoriController::class, 'add']);
+        Route::get('/list', [FavoriController::class, 'list']);
+        Route::delete('/{id}', [FavoriController::class, 'delete']);
+        Route::post('/check', [FavoriController::class, 'checkFavori']);
+    });
 
     // Paiement Marchand
     Route::post('/merchant/pay', [MerchantController::class, 'processPayment']);
     Route::get('/merchant/stats', [MerchantController::class, 'getStats']);
+    Route::get('/merchant/qr', [MerchantController::class, 'generateQR']);
+    Route::post('/payment/qr', [MerchantController::class, 'processQRPayment']);
     
     // Gestion du compte
     Route::prefix('account')->group(function () {

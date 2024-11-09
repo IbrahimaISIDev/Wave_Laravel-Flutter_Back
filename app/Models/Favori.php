@@ -13,17 +13,20 @@ class Favori extends Model
 
     protected $fillable = [
         'user_id',
-        'favori_id',
-        'alias'
+        'telephone',
+        'nom_complet'
     ];
 
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime'
+    ];
+
+    /**
+     * Get the user that owns the favori
+     */
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function favori()
-    {
-        return $this->belongsTo(User::class, 'favori_id');
     }
 }
