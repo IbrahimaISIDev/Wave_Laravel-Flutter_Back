@@ -22,7 +22,7 @@ class RegisterController extends Controller
 
             // Masquer le code dans la réponse
             $userResponse = $result['user']->toArray();
-            $userResponse['code'] = '******';
+            $userResponse['code'];
 
             return response()->json([
                 'message' => 'Utilisateur créé avec succès',

@@ -10,7 +10,7 @@ use App\Http\Requests\MultipleTransferRequest;
 use App\Http\Requests\TransactionHistoryRequest;
 use App\Services\TransactionHistoryService;
 
-class TransactionController extends Controller
+class TransfertController extends Controller
 {
     protected $transferService;
     protected $historyService;

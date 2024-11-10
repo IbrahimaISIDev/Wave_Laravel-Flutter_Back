@@ -18,10 +18,9 @@ class RegisterRequest extends FormRequest
             'prenom' => 'required|string|max:50',
             'telephone' => 'required|string|max:20|unique:users,telephone',
             'email' => 'required|string|email|max:100|unique:users,email',
-            'roleId' => 'required|exists:role,id',
             'adresse' => 'required|string|max:255',
+            'sexe' => 'required|in:homme,femme', // Validation du sexe
             'date_naissance' => 'required|date|before:today',
-            'secret' => 'required|string|min:5|max:6',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Règle de validation pour la photo
         ];
     }

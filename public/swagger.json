@@ -1,0 +1,323 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "API Wave",
+      "description": "Documentation de l'API Wave pour les transferts d'argent et paiements",
+      "version": "1.0.0"
+    },
+    "servers": [
+      {
+        "url": "http://localhost:8000/api",
+        "description": "Serveur local"
+      }
+    ],
+    "components": {
+      "securitySchemes": {
+        "bearerAuth": {
+          "type": "http",
+          "scheme": "bearer",
+          "bearerFormat": "JWT"
+        }
+      }
+    },
+    "paths": {
+      "/register": {
+        "post": {
+          "tags": ["Authentification"],
+          "summary": "Inscription d'un nouvel utilisateur",
+          "description": "Permet de créer un nouveau compte utilisateur",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "multipart/form-data": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "nom": {
+                      "type": "string",
+                      "example": "Doe"
+                    },
+                    "prenom": {
+                      "type": "string",
+                      "example": "John"
+                    },
+                    "telephone": {
+                      "type": "string",
+                      "example": "771234567"
+                    },
+                    "email": {
+                      "type": "string",
+                      "format": "email",
+                      "example": "john@example.com"
+                    },
+                    "adresse": {
+                      "type": "string",
+                      "example": "123 Rue Example"
+                    },
+                    "date_naissance": {
+                      "type": "string",
+                      "format": "date",
+                      "example": "1990-01-01"
+                    },
+                    "roleId": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "photo": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Utilisateur créé avec succès",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "example": "Utilisateur créé avec succès"
+                      },
+                      "user": {
+                        "type": "object"
+                      },
+                      "qr_url": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Erreur serveur"
+            }
+          }
+        }
+      },
+      "/login": {
+        "post": {
+          "tags": ["Authentification"],
+          "summary": "Connexion utilisateur",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "telephone": {
+                      "type": "string",
+                      "example": "771234567"
+                    },
+                    "secret_code": {
+                      "type": "string",
+                      "example": "123456"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Connexion réussie",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "boolean"
+                      },
+                      "message": {
+                        "type": "string"
+                      },
+                      "user": {
+                        "type": "object"
+                      },
+                      "access_token": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/logout": {
+        "post": {
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "tags": ["Authentification"],
+          "summary": "Déconnexion",
+          "responses": {
+            "200": {
+              "description": "Déconnexion réussie"
+            }
+          }
+        }
+      },
+      "/me": {
+        "get": {
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "tags": ["Utilisateur"],
+          "summary": "Obtenir le profil de l'utilisateur connecté",
+          "responses": {
+            "200": {
+              "description": "Profil utilisateur"
+            }
+          }
+        }
+      },
+      "/favoris/add": {
+        "post": {
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "tags": ["Favoris"],
+          "summary": "Ajouter un favori",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "telephone": {
+                      "type": "string",
+                      "example": "771234567"
+                    },
+                    "nom_complet": {
+                      "type": "string",
+                      "example": "John Doe"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Favori ajouté avec succès"
+            }
+          }
+        }
+      },
+      "/favoris/list": {
+        "get": {
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "tags": ["Favoris"],
+          "summary": "Liste des favoris",
+          "responses": {
+            "200": {
+              "description": "Liste des favoris récupérée"
+            }
+          }
+        }
+      },
+      "/favoris/{id}": {
+        "delete": {
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "tags": ["Favoris"],
+          "summary": "Supprimer un favori",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "id",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Favori supprimé avec succès"
+            }
+          }
+        }
+      },
+      "/transfer": {
+        "post": {
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "tags": ["Transferts"],
+          "summary": "Effectuer un transfert",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "destinataire": {
+                      "type": "string",
+                      "example": "771234567"
+                    },
+                    "montant": {
+                      "type": "number",
+                      "example": 1000
+                    },
+                    "motif": {
+                      "type": "string",
+                      "example": "Remboursement"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Transfert effectué avec succès"
+            }
+          }
+        }
+      },
+      "/transactions/history": {
+        "get": {
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "tags": ["Transactions"],
+          "summary": "Historique des transactions",
+          "responses": {
+            "200": {
+              "description": "Historique récupéré avec succès"
+            }
+          }
+        }
+      }
+    }
+  }

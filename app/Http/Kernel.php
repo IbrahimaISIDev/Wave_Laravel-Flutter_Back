@@ -74,5 +74,6 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         // ... autres middlewares
         'role' => \App\Http\Middleware\CheckRole::class,
+        \App\Http\Middleware\LogRedirects::class,
     ];
 }

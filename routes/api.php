@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MerchantController;
 use App\Http\Controllers\RegisterController;
-use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\TransfertController;
 use App\Http\Controllers\UserController;
 
 /*
@@ -20,6 +20,9 @@ use App\Http\Controllers\UserController;
 // Routes publiques
 Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+// Route de vérification du code initial (première étape)
+Route::post('/verify-code', [AuthController::class, 'verifyInitialCode'])->name('verify.code');
+
 
 // Routes protégées
 Route::middleware('auth:sanctum')->group(function () {
@@ -31,19 +34,21 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::put('/users/update-profile', [UserController::class, 'updateProfile']);
     Route::post('update-secret-code', [AuthController::class, 'updateSecretCode']);
+    Route::post('/set-secret-code', [AuthController::class, 'setCustomSecretCode']);
+
     
     // Transferts
-    Route::post('/transfer', [TransactionController::class, 'transfer']);
-    Route::post('/transfer/cancel', [TransactionController::class, 'cancelTransfer']);
+    Route::post('/transfer', [TransfertController::class, 'transfer']);
+    Route::post('/transfer/cancel', [TransfertController::class, 'cancelTransfer']);
     Route::post('/transfer/schedule', [ScheduledTransferController::class, 'schedule']);
-    Route::post('/transfer/multiple', [TransactionController::class, 'multipleTransfer']);
+    Route::post('/transfer/multiple', [TransfertController::class, 'multipleTransfer']);
 
     // Transactions
-    Route::prefix('transactions')->group(function () {
-        Route::get('/history', [TransactionHistoryController::class, 'index']);
-        Route::get('/balance', [TransactionController::class, 'checkBalance']);
-        Route::post('/verify-qr', [TransactionController::class, 'verifyQrCode']);
-    });
+    // Route::prefix('transactions')->group(function () {
+    //     Route::get('/history', [TransactionHistoryController::class, 'index']);
+    //     Route::get('/balance', [TransactionController::class, 'checkBalance']);
+    //     Route::post('/verify-qr', [TransactionController::class, 'verifyQrCode']);
+    // });
 
     // Favoris
     Route::prefix('favoris')->group(function () {
@@ -69,7 +74,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Routes Admin
     Route::middleware('role:admin')->group(function () {
         Route::get('/users', [UserController::class, 'index']);
-        Route::get('/transactions/all', [TransactionController::class, 'allTransactions']);
+        //Route::get('/transactions/all', [TransactionController::class, 'allTransactions']);
         Route::post('/users/block', [UserController::class, 'blockUser']);
         Route::post('/users/unblock', [UserController::class, 'unblockUser']);
     });

@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('invitation', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('users_id')->constrained('users')->onDelete('no action')->onUpdate('no action');
-            $table->text('message')->nullable();
-            $table->timestamps();
+        Schema::table('favoris', function (Blueprint $table) {
+            //
         });
-        
     }
 
     /**
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('invitation');
+        Schema::table('favoris', function (Blueprint $table) {
+            //
+        });
     }
 };

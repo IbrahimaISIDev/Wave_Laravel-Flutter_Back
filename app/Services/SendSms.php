@@ -11,10 +11,10 @@ class SendSms
 
     public function __construct()
     {
-        // Utilisation des informations d'environnement pour initialiser le client Twilio
+        // Use Laravel config to retrieve Twilio credentials
         $this->client = new Client(
-            getenv('TWILIO_ACCOUNT_SID'),
-            getenv('TWILIO_AUTH_TOKEN')
+            config('services.twilio.sid'),
+            config('services.twilio.token')
         );
     }
 
@@ -24,7 +24,7 @@ class SendSms
             $this->client->messages->create(
                 $to,
                 [
-                    'from' => getenv('TWILIO_PHONE_NUMBER'),
+                    'from' => config('services.twilio.phone_number'),
                     'body' => $message
                 ]
             );
@@ -35,3 +35,4 @@ class SendSms
         }
     }
 }
+

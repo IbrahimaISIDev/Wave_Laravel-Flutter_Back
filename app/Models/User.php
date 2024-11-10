@@ -1,15 +1,16 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-class User extends Model
+
+class User extends Authenticatable
 {
-    use HasFactory;
     use HasApiTokens, HasFactory, Notifiable;
+
     protected $fillable = [
         'nom',
         'prenom',
@@ -39,26 +40,16 @@ class User extends Model
 
     public function role()
     {
-        return $this->belongsTo(Role::class, 'role_id');
-    }
+        return $this->belongsTo(Role::class);
+    }    
     
     public function cadeaux()
     {
         return $this->hasMany(Cadeau::class);
     }
 
-    public function cagnotte()
-    {
-        return $this->hasMany(Cagnotte::class);
-    }
-
     public function transactions()
     {
         return $this->hasMany(Transaction::class, 'exp');
     }
-
-    /* public function role()
-    {
-        return $this->belongsTo(Role::class);
-    } */
 }

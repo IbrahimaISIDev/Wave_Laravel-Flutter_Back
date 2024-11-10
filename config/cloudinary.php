@@ -1,52 +1,33 @@
 <?php
 
-/*
- * This file is part of the Laravel Cloudinary package.
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Cloudinary Configuration
     |--------------------------------------------------------------------------
-    |
-    | An HTTP or HTTPS URL to notify your application (a webhook) when the process of uploads, deletes, and any API
-    | that accepts notification_url has completed.
-    |
-    |
     */
+    
+    // Configuration de base
+    'cloud_name' => env('CLOUDINARY_CLOUD_NAME', 'dw3vcn5ae'),
+    'api_key' => env('CLOUDINARY_API_KEY', '911558151572114'),
+    'api_secret' => env('CLOUDINARY_API_SECRET', 'Z9O0oOtS2knyfwanxKTYo_lUGis'),
+    'secure' => true,
+
+    // URL pour les webhooks
     'notification_url' => env('CLOUDINARY_NOTIFICATION_URL'),
 
+    // URL complète de Cloudinary (format alternatif de configuration)
+    'cloud_url' => env('CLOUDINARY_URL', 'cloudinary://911558151572114:Z9O0oOtS2knyfwanxKTYo_lUGis@dw3vcn5ae'),
 
-    /*
-    |--------------------------------------------------------------------------
-    | Cloudinary Configuration
-    |--------------------------------------------------------------------------
-    |
-    | Here you may configure your Cloudinary settings. Cloudinary is a cloud hosted
-    | media management service for all file uploads, storage, delivery and transformation needs.
-    |
-    |
-    */
-    'cloud_url' => env('CLOUDINARY_URL'),
-
-    /**
-     * Upload Preset From Cloudinary Dashboard
-     *
-     */
+    // Configurations supplémentaires
     'upload_preset' => env('CLOUDINARY_UPLOAD_PRESET'),
+    'upload_route' => env('CLOUDINARY_UPLOAD_ROUTE', 'cloudinary.upload'),
+    'upload_action' => env('CLOUDINARY_UPLOAD_ACTION', 'App\Http\Controllers\CloudinaryController@upload'),
 
-    /**
-     * Route to get cloud_image_url from Blade Upload Widget
-     */
-    'upload_route' => env('CLOUDINARY_UPLOAD_ROUTE'),
-
-    /**
-     * Controller action to get cloud_image_url from Blade Upload Widget
-     */
-    'upload_action' => env('CLOUDINARY_UPLOAD_ACTION'),
+    // Paramètres par défaut pour les uploads
+    'defaults' => [
+        'folder' => env('CLOUDINARY_FOLDER', 'my_uploads'),
+        'resource_type' => 'auto',
+        'invalidate' => true,
+    ],
 ];

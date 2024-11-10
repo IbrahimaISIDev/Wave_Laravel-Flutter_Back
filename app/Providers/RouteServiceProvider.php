@@ -10,30 +10,20 @@ use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends ServiceProvider
 {
-    public const HOME = '/home';
-
+    // Ce préfixe est important
     protected $namespace = 'App\\Http\\Controllers';
-
-    public function boot(): void
+    
+    public function boot()
     {
-        $this->configureRateLimiting();
+        // ...
 
         $this->routes(function () {
             Route::middleware('api')
-                ->prefix('api')
-                ->namespace($this->namespace)
+                ->prefix('api')  // Assurez-vous que cette ligne existe
                 ->group(base_path('routes/api.php'));
 
             Route::middleware('web')
-                ->namespace($this->namespace)
                 ->group(base_path('routes/web.php'));
-        });
-    }
-
-    protected function configureRateLimiting()
-    {
-        RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
     }
 }
