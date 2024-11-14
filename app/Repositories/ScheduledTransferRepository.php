@@ -48,4 +48,23 @@ class ScheduledTransferRepository implements ScheduledTransferRepositoryInterfac
         $scheduledTransfer->update($data);
         return $scheduledTransfer;
     }
+
+
+    public function findById(int $id)
+    {
+        return $this->model->find($id);
+    }
+
+    public function findDuplicate($expediteur, $destinataire, $montant, $dateDebut, $heureExecution)
+    {
+        return $this->model
+            ->where('exp', $expediteur)
+            ->where('destinataire', $destinataire)
+            ->where('montant', $montant)
+            ->where('date_debut', $dateDebut)
+            ->where('heure_execution', $heureExecution)
+            ->where('is_active', true)
+            ->first();
+    }
+  
 }

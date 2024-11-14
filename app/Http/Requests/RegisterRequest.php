@@ -21,6 +21,7 @@ class RegisterRequest extends FormRequest
             'adresse' => 'required|string|max:255',
             'sexe' => 'required|in:homme,femme', // Validation du sexe
             'date_naissance' => 'required|date|before:today',
+            'secret' => 'required|string|min:4|max:6',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Règle de validation pour la photo
         ];
     }

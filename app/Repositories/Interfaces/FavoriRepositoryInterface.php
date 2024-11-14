@@ -11,4 +11,6 @@ interface FavoriRepositoryInterface
     public function delete($id);
     public function existsByPhone($userId, $telephone);
     public function belongsToUser($userId, $favoriId);
+    public function deleteByFavoriId($userId, $favoriId);
+
 }

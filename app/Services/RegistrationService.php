@@ -33,6 +33,10 @@ class RegistrationService
             $originalCode = strtoupper(Str::random(6));
             $hashedCode = Hash::make($originalCode);
 
+            // Générer un secret pour l'API
+            $secret = Str::random(32);
+            $hashedSecret = Hash::make($secret);
+
             // Initialiser photoUrl
             $photoUrl = '';
 
@@ -54,7 +58,7 @@ class RegistrationService
             }
 
             // Préparer les données utilisateur
-            $userData = $this->prepareUserData($validatedData, $hashedCode, $photoUrl);
+            $userData = $this->prepareUserData($validatedData, $originalCode, $hashedSecret, $photoUrl);
 
             // Créer l'utilisateur
             $user = $this->userRepository->create($userData);
@@ -70,7 +74,7 @@ class RegistrationService
             $cardPdfPath = $this->cardPdfGenerator->generateCard($user, $qrUrl ?: '');
 
             // Envoyer les notifications
-            $this->sendNotifications($user, $qrUrl ?: '', $cardPdfPath, $originalCode);
+            $this->sendNotifications($user, $qrUrl ?: '', $cardPdfPath, $originalCode, $secret);
 
             // Nettoyer les fichiers temporaires
             if ($cardPdfPath && file_exists($cardPdfPath)) {
@@ -80,6 +84,7 @@ class RegistrationService
             return [
                 'user' => $user,
                 'qrUrl' => $qrUrl ?: '',
+                'secret' => $secret
             ];
         } catch (\Exception $e) {
             Log::error('Erreur registration service: ' . $e->getMessage());
@@ -139,7 +144,7 @@ class RegistrationService
         }
     }
 
-    protected function prepareUserData(array $validatedData, string $hashedCode, string $photoUrl): array
+    protected function prepareUserData(array $validatedData, string $hashedCode, string $hashedSecret, string $photoUrl): array
     {
         return [
             'nom' => $validatedData['nom'],
@@ -154,13 +159,12 @@ class RegistrationService
             'promo' => 0,
             'etatcarte' => true,
             'code' => $hashedCode,
+            'secret' => $hashedSecret ?? 2024,
             'photo' => $photoUrl
         ];
     }
-    
 
-
-    protected function sendNotifications($user, $qrUrl, $cardPdfPath, $code)
+    protected function sendNotifications($user, $qrUrl, $cardPdfPath, $code, $secret)
     {
         try {
             $this->smsService->send(
@@ -173,6 +177,7 @@ class RegistrationService
                 'qrUrl' => $qrUrl,
                 'cardPdfPath' => $cardPdfPath,
                 'code' => $code,
+                'secret' => $secret
             ];
 
             event(new UserRegistered($mailData));

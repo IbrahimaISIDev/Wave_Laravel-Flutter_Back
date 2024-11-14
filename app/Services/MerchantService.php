@@ -12,7 +12,7 @@ class MerchantService
     protected $transactionRepository;
     protected $userRepository;
 
-    const ROLE_MARCHAND = 2; // Assurez-vous que cet ID correspond à votre rôle marchand
+    const ROLE_MARCHAND = 3; // Assurez-vous que cet ID correspond à votre rôle marchand
 
     public function __construct(
         TransactionRepositoryInterface $transactionRepository,

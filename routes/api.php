@@ -7,8 +7,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MerchantController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\TransfertController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 
 /*
@@ -36,19 +38,22 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('update-secret-code', [AuthController::class, 'updateSecretCode']);
     Route::post('/set-secret-code', [AuthController::class, 'setCustomSecretCode']);
 
-    
+
     // Transferts
     Route::post('/transfer', [TransfertController::class, 'transfer']);
-    Route::post('/transfer/cancel', [TransfertController::class, 'cancelTransfer']);
+    Route::get('/history', [TransactionHistoryController::class, 'index']);
+    // Route::post('/transfer/cancel', [TransfertController::class, 'cancelTransfer']);
     Route::post('/transfer/schedule', [ScheduledTransferController::class, 'schedule']);
     Route::post('/transfer/multiple', [TransfertController::class, 'multipleTransfer']);
+    Route::post('/transfer/{id}/cancel', [TransfertController::class, 'cancelTransfer']);
 
-    // Transactions
-    // Route::prefix('transactions')->group(function () {
-    //     Route::get('/history', [TransactionHistoryController::class, 'index']);
-    //     Route::get('/balance', [TransactionController::class, 'checkBalance']);
-    //     Route::post('/verify-qr', [TransactionController::class, 'verifyQrCode']);
-    // });
+
+    //Transactions
+    Route::prefix('transactions')->group(function () {
+        Route::get('/history', [TransactionHistoryController::class, 'index']);
+        Route::get('/balance', [TransactionController::class, 'checkBalance']);
+        Route::post('/verify-qr', [TransactionController::class, 'verifyQrCode']);
+    });
 
     // Favoris
     Route::prefix('favoris')->group(function () {
@@ -58,19 +63,25 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/check', [FavoriController::class, 'checkFavori']);
     });
 
+    // Contacts et favoris
+    Route::prefix('contacts')->group(function () {
+        Route::get('/list', [ContactController::class, 'list']);
+        Route::post('/toggle-favori', [ContactController::class, 'toggleFavori']);
+    });
+
     // Paiement Marchand
     Route::post('/merchant/pay', [MerchantController::class, 'processPayment']);
     Route::get('/merchant/stats', [MerchantController::class, 'getStats']);
     Route::get('/merchant/qr', [MerchantController::class, 'generateQR']);
     Route::post('/payment/qr', [MerchantController::class, 'processQRPayment']);
-    
+
     // Gestion du compte
     Route::prefix('account')->group(function () {
         Route::put('/toggle-card', [UserController::class, 'toggleCard']);
         Route::post('/regenerate-qr', [UserController::class, 'regenerateQrCode']);
         Route::put('/update-pin', [UserController::class, 'updatePin']);
     });
-    
+
     // Routes Admin
     Route::middleware('role:admin')->group(function () {
         Route::get('/users', [UserController::class, 'index']);
@@ -81,7 +92,7 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 // Route de fallback pour les URL non trouvées
-Route::fallback(function(){
+Route::fallback(function () {
     return response()->json([
         'message' => 'Route non trouvée. Veuillez vérifier l\'URL et la méthode HTTP.'
     ], 404);

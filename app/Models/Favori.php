@@ -14,7 +14,9 @@ class Favori extends Model
     protected $fillable = [
         'user_id',
         'telephone',
-        'nom_complet'
+        'favori_id',
+        'nom_complet',
+        'alias'
     ];
 
     protected $casts = [
@@ -28,5 +30,10 @@ class Favori extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function favoredUser()
+    {
+        return $this->belongsTo(User::class, 'favori_id');
     }
 }

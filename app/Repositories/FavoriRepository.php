@@ -70,4 +70,20 @@ class FavoriRepository implements FavoriRepositoryInterface
             ->where('user_id', $userId)
             ->exists();
     }
+
+    public function deleteByPhone($userId, $telephone)
+    {
+        return $this->model
+            ->where('user_id', $userId)
+            ->where('telephone', $telephone)
+            ->delete();
+    }
+
+    public function deleteByFavoriId($userId, $favoriId)
+    {
+        return $this->model
+            ->where('user_id', $userId)
+            ->where('favori_id', $favoriId)
+            ->delete();
+    }
 }

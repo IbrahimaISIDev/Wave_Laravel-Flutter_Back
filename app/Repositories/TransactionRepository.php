@@ -3,20 +3,38 @@
 namespace App\Repositories;
 
 use App\Models\Transaction;
+use App\Models\Contact;
 use App\Repositories\Interfaces\TransactionRepositoryInterface;
 use Illuminate\Database\Eloquent\Builder;
+use Carbon\Carbon;
+
 class TransactionRepository implements TransactionRepositoryInterface
 {
     protected $model;
+    protected $contactModel;
 
-    public function __construct(Transaction $model)
+    public function __construct(Transaction $model, Contact $contactModel)
     {
         $this->model = $model;
+        $this->contactModel = $contactModel;
     }
 
     public function create(array $data)
     {
-        return $this->model->create($data);
+        $transaction = $this->model->create($data);
+
+        // Crée ou met à jour le contact après une transaction
+        $this->contactModel->updateOrCreate(
+            [
+                'user_id' => $data['exp'],
+                'contact_id' => $data['destinataire']
+            ],
+            [
+                'last_transaction' => now()
+            ]
+        );
+
+        return $transaction;
     }
 
     public function findByUser(int $userId)
@@ -38,7 +56,6 @@ class TransactionRepository implements TransactionRepositoryInterface
         $transaction->update($data);
         return $transaction;
     }
-   
 
     public function getHistory($userId, array $filters = [], $perPage = 15)
     {
@@ -48,18 +65,12 @@ class TransactionRepository implements TransactionRepositoryInterface
                       ->orWhere('destinataire', $userId);
             })
             ->with([
-                'expediteur' => function ($query) {
-                    $query->select('id', 'nom', 'prenom', 'telephone');
-                },
-                'beneficiaire' => function ($query) {
-                    $query->select('id', 'nom', 'prenom', 'telephone');
-                },
-                'type' => function ($query) {
-                    $query->select('id', 'libelle');
-                }
+                'expediteur:id,nom,prenom,telephone',
+                'beneficiaire:id,nom,prenom,telephone',
+                'type:id,libelle'
             ]);
 
-        // Appliquer les filtres
+        // Application des filtres
         if (!empty($filters['start_date'])) {
             $query->whereDate('created_at', '>=', $filters['start_date']);
         }
@@ -94,7 +105,6 @@ class TransactionRepository implements TransactionRepositoryInterface
                   ->orWhere('destinataire', $userId);
         });
 
-        // Appliquer les mêmes filtres que pour l'historique
         if (!empty($filters['start_date'])) {
             $query->whereDate('created_at', '>=', $filters['start_date']);
         }
@@ -103,28 +113,49 @@ class TransactionRepository implements TransactionRepositoryInterface
             $query->whereDate('created_at', '<=', $filters['end_date']);
         }
 
-        $stats = [
-            'total_envoyé' => $query->clone()->where('exp', $userId)->sum('montant'),
-            'total_reçu' => $query->clone()->where('destinataire', $userId)->sum('montant'),
-            'nombre_envois' => $query->clone()->where('exp', $userId)->count(),
-            'nombre_receptions' => $query->clone()->where('destinataire', $userId)->count(),
+        return [
+            'total_envoyé' => $query->clone()->where('exp', $userId)->where('status', 'completed')->sum('montant'),
+            'total_reçu' => $query->clone()->where('destinataire', $userId)->where('status', 'completed')->sum('montant'),
+            'nombre_envois' => $query->clone()->where('exp', $userId)->where('status', 'completed')->count(),
+            'nombre_receptions' => $query->clone()->where('destinataire', $userId)->where('status', 'completed')->count()
         ];
-
-        return $stats;
     }
+
     public function getMerchantTransactions(int $merchantId, array $filters = [])
     {
         $query = $this->model
             ->where('destinataire', $merchantId)
-            ->where('type_id', 4) // PAIEMENT_MARCHAND
-            ->where('status', 'completed');
+            ->where('type_id', 4)  // PAIEMENT_MARCHAND
+            ->where('status', 'completed')
+            ->with([
+                'expediteur:id,nom,prenom,telephone',
+                'type:id,libelle'
+            ]);
 
+        // Filtrage par date
         if (isset($filters['start_date'])) {
             $query->whereDate('created_at', '>=', $filters['start_date']);
         }
 
         if (isset($filters['end_date'])) {
             $query->whereDate('created_at', '<=', $filters['end_date']);
+        }
+
+        // Filtrage par montant
+        if (isset($filters['montant_min'])) {
+            $query->where('montant', '>=', $filters['montant_min']);
+        }
+
+        if (isset($filters['montant_max'])) {
+            $query->where('montant', '<=', $filters['montant_max']);
+        }
+
+        // Par défaut, trier par date décroissante
+        $query->orderBy('created_at', 'desc');
+
+        // Si pagination demandée
+        if (isset($filters['paginate']) && $filters['paginate']) {
+            return $query->paginate($filters['per_page'] ?? 15);
         }
 
         return $query->get();

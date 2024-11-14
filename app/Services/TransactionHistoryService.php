@@ -25,16 +25,18 @@ class TransactionHistoryService
             $formattedTransactions = $transactions->map(function ($transaction) use ($userId) {
                 $isExpediteur = $transaction->exp === $userId;
                 $autrePartie = $isExpediteur ? $transaction->beneficiaire : $transaction->expediteur;
+                $type = $transaction->type;
 
                 return [
                     'id' => $transaction->id,
                     'type' => [
-                        'id' => $transaction->type->id,
-                        'libelle' => $transaction->type->libelle
+                        'id' => $type->id,
+                        'libelle' => $type->libelle
                     ],
+                    'type_operation' => $isExpediteur ? 'envoi' : 'reception',
                     'montant' => $transaction->montant,
                     'date' => Carbon::parse($transaction->created_at)->format('Y-m-d H:i:s'),
-                    'status' => $transaction->status ?? 'completed',
+                    'status' => $transaction->status,
                     'is_expediteur' => $isExpediteur,
                     'autre_partie' => $autrePartie ? [
                         'id' => $autrePartie->id,
